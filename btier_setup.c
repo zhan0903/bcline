@@ -10,6 +10,9 @@
 #include <string.h>
 #include <stdarg.h>
 #include <errno.h>
+
+#include <getopt.h>
+
 #include "../kernel/btier/btier_common.c"
 
 #define die_ioctlerr(f...) { fprintf(stderr,(f)); flock(fd, LOCK_UN); exit(-1); }
@@ -362,9 +365,65 @@ int get_opts(int argc, char *argv[])
 {
 
 	int c, ret = 0;
+        int flag_value = 100;
+        int option_index = 0;
+        int rvalue = 0;
 
-	while ((c = getopt(argc, argv, "VBcd:bhcsf:m:z:")) != -1)
-		switch (c) {
+        static struct option long_option[] = {
+               {"dev",required_argument,0,0},
+               {"bs",required_argument,0,0},
+               {"reserve",required_argument,0,0},
+               {"vol",required_argument,0,0},
+               {"extendsize",required_argument,0,0},
+               {0,0,0,0},
+               };
+
+	while ((c = getopt_long(argc, argv, "VBcd:bhcsf:m:z:",long_option,&option_index)) != -1)
+                switch(option_index){
+                case 0:
+                      printf("long option is:%s\n",long_option[option_index].name);
+                      if(optarg)
+                      {
+                           printf("with parm '%s'",optarg);
+                      }
+                      printf("\n");
+                      break;
+                 case 1:
+                      printf("Long option is : %s ",long_option[option_index].name);
+                      if(optarg)
+                      {
+                           printf("with parm '%s'",optarg);
+                      }
+                       printf("\n");
+                       break;
+
+                 case 2:
+                       printf("Long option is : %s ",long_option[option_index].name);
+                       if(optarg)
+                       {
+                            printf("with parm '%s'",optarg);
+                       }
+                       printf("\n");
+                       break;
+
+                 case 3:
+                       printf("Long option is : %s\n",long_option[option_index].name);
+                       if(optarg)
+                       {
+                           printf("with parm '%s'",optarg);
+                       }
+                       printf("\n");
+                       break;
+                  default:
+                       abort();
+        }
+
+        printf("flag_value = %d\n",flag_value);  
+
+
+
+        //        }
+/*		switch (c) {
                 case 'B':
                         mkoptions.use_bio = USE_BIO;
                         break;
@@ -422,8 +481,7 @@ int get_opts(int argc, char *argv[])
 			break;
 		default:
 			abort();
-		}
-	printf("\n");
+		}*/
 	return ret;
 }
 
@@ -455,7 +513,7 @@ int main(int argc, char *argv[])
 		usage(argv[0]);
 	if (0 != get_opts(argc, argv))
 		exit(-1);
-
+        exit(0);
 	if ((fd = open("/dev/tiercontrol", mode)) < 0) {
 		fprintf(stderr,
 			"Failed to open /dev/tiercontrol, is tier.ko loaded?\n");
