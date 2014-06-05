@@ -42,6 +42,7 @@ struct option_info {
 	u64 total_device_size;
 	u64 bitlistsize_total;
         int use_bio;
+        char *blocksize;
 };
 
 void *s_malloc(size_t size)
@@ -381,18 +382,21 @@ int get_opts(int argc, char *argv[])
 	while ((c = getopt_long(argc, argv, "VBcd:bhcsf:m:z:",long_option,&option_index)) != -1)
                 switch(option_index){
                 case 0:
-                      printf("long option is:%s\n",long_option[option_index].name);
-                      if(optarg)
+                      printf("long option is : %s ",long_option[option_index].name);
+                      if(optarg)//get the dev's name and allocate memory for the dev
                       {
                            printf("with parm '%s'",optarg);
+                           mkoptions.backdev[0] = s_malloc(sizeof(struct backing_device));
+                           mkoptions.backdev[0]->datafile = optarg;
                       }
                       printf("\n");
                       break;
                  case 1:
                       printf("Long option is : %s ",long_option[option_index].name);
-                      if(optarg)
+                      if(optarg)//get the blocksize
                       {
                            printf("with parm '%s'",optarg);
+                           printf("the default blocksize is 4M, you cannot change it now, sorry");
                       }
                        printf("\n");
                        break;
@@ -418,70 +422,6 @@ int get_opts(int argc, char *argv[])
                        abort();
         }
 
-        printf("flag_value = %d\n",flag_value);  
-
-
-
-        //        }
-/*		switch (c) {
-                case 'B':
-                        mkoptions.use_bio = USE_BIO;
-                        break;
-                case 'V':
-                        mkoptions.use_bio = USE_VFS;
-                        break;
-		case 'c':
-			mkoptions.create = 1;
-			break;
-		case 'f':
-			if (optopt == 'f')
-				printf
-				    ("Option -%c requires a lessfs configuration file as argument.\n",
-				     optopt);
-			else
-				parse_datafile(optarg);
-			break;
-		case 'd':
-			if (optopt == 'd')
-				printf
-				    ("Option -%c requires a device as argument.\n",
-				     optopt);
-			else {
-				mkoptions.device = optarg;
-			}
-			break;
-		case 's':
-			mkoptions.sync = 1;
-			break;
-		case 'z':
-			if (optopt == 'z')
-				printf
-				    ("Option -%c requires sector size as argument.\n",
-				     optopt);
-			else {
-				sscanf(optarg, "%i", &mkoptions.sectorsize);
-				if (mkoptions.sectorsize > 4096)
-					mkoptions.sectorsize = 0;
-				if (mkoptions.sectorsize < 0)
-					mkoptions.sectorsize = 0;
-				if (mkoptions.sectorsize > 0) {
-					ret = mkoptions.sectorsize / 512;
-					ret *= 512;
-					if (ret != mkoptions.sectorsize) {
-						ret = -1;
-						printf
-						    ("The sectorsize has to be a multiple of 512 bytes\n");
-					} else
-						ret = 0;
-				}
-			}
-			break;
-		case 'h':
-			usage(argv[0]);
-			break;
-		default:
-			abort();
-		}*/
 	return ret;
 }
 
